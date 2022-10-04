@@ -18,13 +18,13 @@ export async function periodicPortfolio(member: Discord.User) {
 
     await member.send(`Fetching Portfolio...`);
 
-    const descriptions = await portfolioHandler(data, true);
+    const descriptions = await portfolioHandler(data);
     for (let i = 0; i < descriptions.length; i++) {
         member.send(descriptions[i]);
     }
 }
 
-async function command(msg: Discord.Message, isLarge: boolean = false) {
+async function command(msg: Discord.Message) {
     const db = await getDatabase();
 
     let data: IPortfolio = await db.fetchData('id', msg.author.id, COLLECTIONS.CRYPTO);
@@ -37,7 +37,7 @@ async function command(msg: Discord.Message, isLarge: boolean = false) {
         return;
     }
 
-    const descriptions = await portfolioHandler(data, isLarge);
+    const descriptions = await portfolioHandler(data);
 
     for (let i = 0; i < descriptions.length; i++) {
         if (data.privacy) {
@@ -50,7 +50,7 @@ async function command(msg: Discord.Message, isLarge: boolean = false) {
     }
 }
 
-async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Promise<Array<string>> {
+async function portfolioHandler(data: IPortfolio): Promise<Array<string>> {
     const db = await getDatabase();
 
     if (!data.history) {
@@ -69,6 +69,9 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
     let noHeading = false;
     let description = '```';
     let count = 0;
+    let grandTotalBuyValue = 0;
+    let grandTotalCurrentValue = 0;
+
 
     for (let i = 0; i < stats.portfolio.length; i++) {
         // Create the Table Style
@@ -76,46 +79,49 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
             newTable = false;
 
             if (!noHeading) {
-                if (isLarge) {
-                    portfolioTable.setHeading('$', `AMOUNT`, `TOTAL`, `COIN`, `CHANGE`);
-                } else {
-                    portfolioTable.setHeading('$', `AMOUNT`, `TOTAL`, `CHANGE`);
-                }
+                portfolioTable.setHeading('$', `COIN COST`, `QTY`, `TOTAL COST`, `CURRENT POSITION`, `CHANGE`, `% CHANGE`);
             }
-
             portfolioTable.setHeadingAlign(AsciiTable.RIGHT);
         }
         // console.log(stats);
         const coin = stats.portfolio[i];
         const ticker = coin.ticker;
-        const fixedAmount = coin.amount.toLocaleString();
-        const fixedValue = parseFloat(coin.value.toFixed(2)).toLocaleString();
-        
-        let sum = 0; //we will calculate the average of the addhistory price
-        addhistories[ticker].forEach(item => {
-            sum += item.value
-        });
-        // let average = sum/Object.keys(addhistories[ticker]).length;
-        console.log("Sum", sum)
+        const Amount = coin.amount;
+        // const currentValue = parseFloat(coin.value.toFixed(2)).toLocaleString();
+        const currentValue = coin.value;
+        grandTotalCurrentValue += currentValue;
+        const buyCoin = addhistories[ticker][0].price;
+        const buyValue = addhistories[ticker][0].value;
+        grandTotalBuyValue += buyValue;
+        const tChange = currentValue - buyValue;
+        const pChange = ((currentValue - buyValue)/buyValue) * 100;
+
+
+
+        // let sum = 0; //we will calculate the average of the addhistory price
+        // addhistories[ticker].forEach(item => {
+        //     sum += item.value
+        // });
+        // let average = sum/coin.amount;
+        // console.log("Sum", sum)
         // console.log("Average is : ", average);
-        const fixedDiff = parseFloat((coin.value - sum).toFixed(2)).toLocaleString() ;
+        // const fixedDiff = parseFloat((coin.value - sum).toFixed(2)).toLocaleString() ;
         
         // if (addhistories) {
         //     for (let e of addhistories) if (e && e.hasOwnProperty(parameter)) sum += e[parameter];
         //   }
         // const change = "0" //put logic here
-        if (isLarge) {
-            portfolioTable.addRow(
+        
+        portfolioTable.addRow(
                 ticker.toUpperCase(),
-                fixedAmount,
-                `$${fixedValue}`,
-                `$${coin.price}`, 
-                fixedDiff
+                `$${parseFloat(buyCoin.toFixed(2)).toLocaleString()}` ,
+                `$${parseFloat(Amount.toFixed(2)).toLocaleString()}` ,
+                `$${parseFloat(buyValue.toFixed(2)).toLocaleString()}` ,
+                `$${parseFloat(currentValue.toFixed(2)).toLocaleString()}` ,
+                `$${parseFloat(tChange.toFixed(2)).toLocaleString()}` ,
+                `${parseFloat(pChange.toFixed(2)).toLocaleString()}%` 
             );
-        } else {
-            portfolioTable.addRow(coin.ticker.toUpperCase(), fixedAmount, `$${fixedValue}`,  `$${fixedDiff}`);
-        }
-
+        
         portfolioTable.setAlign(i, AsciiTable.RIGHT);
         count += 1;
 
@@ -138,11 +144,16 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
 
         portfolioTable = new AsciiTable('');
     }
-
+    console.log("stats total", stats.total, "grand total", grandTotalCurrentValue);
     const totalsTable = new AsciiTable();
-    totalsTable.setHeading(`TOTAL`);
+    totalsTable.setHeading(`TOTAL`, `TOTAL $ CHANGE`, `TOTAL % CHANGE`);
     totalsTable.setHeadingAlign(AsciiTable.RIGHT);
-    totalsTable.addRow(`$${parseFloat(stats.total.toFixed(2)).toLocaleString()}`);
+    totalsTable.addRow(
+        `$${parseFloat(stats.total.toFixed(2)).toLocaleString()}`,
+        `$${parseFloat((grandTotalCurrentValue - grandTotalBuyValue).toFixed(2)).toLocaleString()}` ,
+        `${parseFloat((((grandTotalCurrentValue - grandTotalBuyValue)/grandTotalBuyValue)* 100).toFixed(2)).toLocaleString()}%` ,
+
+    );
 
     description += totalsTable.toString();
     description += '```';
@@ -156,4 +167,4 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
     return descriptions;
 }
 
-registerCommand({ name: 'portfolio', command, description: '<?isLarge> - Print your portfolio.' });
+registerCommand({ name: 'portfolio', command, description: ' Print your portfolio.' });

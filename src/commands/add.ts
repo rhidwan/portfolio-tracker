@@ -48,10 +48,10 @@ async function command(msg: Discord.Message, ticker: string, amount: any) {
         data = await db.insertData({ id: msg.author.id, portfolio: {}, addhistory:{} }, COLLECTIONS.CRYPTO, true);
     }
 
-    if (!data.portfolio[ticker]) {
-        data.portfolio[ticker] = 0;
-        // await msg.reply("Looks like you already have a coin listed in the portfolio. remove this first to add again")
-        // return
+    if (data.portfolio[ticker]) {
+        // data.portfolio[ticker] = 0;
+        await msg.reply("Looks like you already have a coin listed in the portfolio. remove this first to add again")
+        return
     }
 
     // Setup coin add History if Non Existant
