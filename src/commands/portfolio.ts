@@ -2,6 +2,7 @@ import AsciiTable from 'ascii-table';
 import * as Discord from 'discord.js';
 
 import { COLLECTIONS } from '../enums/collections';
+import { IAddHistory } from '../interfaces/IAddHistory';
 import { IPortfolio, IPortfolioFull } from '../interfaces/IPortfolio';
 import { registerCommand } from '../service/commands';
 import { getPortfolioStats, updatePortfolio } from '../utility/algorithms';
@@ -58,6 +59,9 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
 
     console.log(`[BOT] Getting Portfolio for ${data._id}`);
 
+    const addhistories = data.addhistory;
+    // console.log(addhistories);
+
     const stats: IPortfolioFull = await getPortfolioStats(data);
     const descriptions: Array<string> = [];
     let portfolioTable = new AsciiTable('');
@@ -81,15 +85,28 @@ async function portfolioHandler(data: IPortfolio, isLarge: boolean = false): Pro
 
             portfolioTable.setHeadingAlign(AsciiTable.RIGHT);
         }
-
+        // console.log(stats);
         const coin = stats.portfolio[i];
+        const ticker = coin.ticker;
         const fixedAmount = coin.amount.toLocaleString();
         const fixedValue = parseFloat(coin.value.toFixed(2)).toLocaleString();
-        const fixedDiff = parseFloat(coin.diff.toFixed(2)).toLocaleString() ;
+        
+        let sum = 0; //we will calculate the average of the addhistory price
+        addhistories[ticker].forEach(item => {
+            sum += item.value
+        });
+        // let average = sum/Object.keys(addhistories[ticker]).length;
+        console.log("Sum", sum)
+        // console.log("Average is : ", average);
+        const fixedDiff = parseFloat((coin.value - sum).toFixed(2)).toLocaleString() ;
+        
+        // if (addhistories) {
+        //     for (let e of addhistories) if (e && e.hasOwnProperty(parameter)) sum += e[parameter];
+        //   }
         // const change = "0" //put logic here
         if (isLarge) {
             portfolioTable.addRow(
-                coin.ticker.toUpperCase(),
+                ticker.toUpperCase(),
                 fixedAmount,
                 `$${fixedValue}`,
                 `$${coin.price}`, 

@@ -1,3 +1,4 @@
+import { IAddHistory } from './IAddHistory';
 import { IHistory } from './IHistory';
 
 export interface IPortfolio {
@@ -15,6 +16,9 @@ export interface IPortfolio {
     history?: {
         [key: string]: Array<IHistory>;
     };
+    addhistory?:{
+        [key:string]:Array<IAddHistory>;
+    }
 }
 
 export interface IPortfolioFull {
