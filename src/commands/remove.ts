@@ -33,9 +33,10 @@ async function command(msg: Discord.Message, ticker: string) {
 
     let data: IPortfolio = await db.fetchData('id', msg.author.id, COLLECTIONS.CRYPTO);
     if (!data) {
-        data = await db.insertData({ id: msg.author.id, portfolio: {}, history: {} }, COLLECTIONS.CRYPTO, true);
+        data = await db.insertData({ id: msg.author.id, portfolio: {}, history: {}, addhistory:{} }, COLLECTIONS.CRYPTO, true);
     }
     
+
     if (!data.portfolio[ticker]) {
         msg.reply(`That token is not in your portfolio.`);
         return;
@@ -46,9 +47,10 @@ async function command(msg: Discord.Message, ticker: string) {
     // if (data.portfolio[ticker] <= 0) {
     delete data.portfolio[ticker];
     delete data.history[ticker];
+    delete data.addhistory[ticker];
     // }
 
-    await db.updatePartialData(data._id, { portfolio: data.portfolio, history: data.history }, COLLECTIONS.CRYPTO);
+    await db.updatePartialData(data._id, { portfolio: data.portfolio, history: data.history, addhistory: data.addhistory }, COLLECTIONS.CRYPTO);
     if (data.privacy) {
         msg.author.send(`Removed $${ticker.toUpperCase()} from your portfolio.`).catch((err) => {
             msg.reply(`Could not send you a private message. Open your DMs nerd.`);

@@ -87,6 +87,7 @@ async function portfolioHandler(data: IPortfolio): Promise<Array<string>> {
         const coin = stats.portfolio[i];
         const ticker = coin.ticker;
         const Amount = coin.amount;
+
         // const currentValue = parseFloat(coin.value.toFixed(2)).toLocaleString();
         const currentValue = coin.value;
         grandTotalCurrentValue += currentValue;
@@ -96,7 +97,7 @@ async function portfolioHandler(data: IPortfolio): Promise<Array<string>> {
         const tChange = currentValue - buyValue;
         const pChange = ((currentValue - buyValue)/buyValue) * 100;
 
-
+        // console.log(ticker, Amount, buyValue, currentValue, stats);
 
         // let sum = 0; //we will calculate the average of the addhistory price
         // addhistories[ticker].forEach(item => {

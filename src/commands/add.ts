@@ -59,7 +59,7 @@ async function command(msg: Discord.Message, ticker: string, amount: any) {
         data.addhistory[ticker] = [];
     }
 
-    data.portfolio[ticker] += amount;
+    data.portfolio[ticker] = amount;
     data.addhistory[ticker].push({amount: amount, price:current_price, value:current_value})
 
     await db.updatePartialData(data._id, { portfolio: data.portfolio, addhistory: data.addhistory }, COLLECTIONS.CRYPTO);
