@@ -5,6 +5,10 @@ import { COLLECTIONS } from '../enums/collections';
 import { IPortfolio } from '../interfaces/IPortfolio';
 import { registerCommand } from '../service/commands';
 import { getDatabase } from '../utility/database';
+var path = require('path');
+const fs = require('fs');
+
+var config_file_path = path.resolve(__dirname, "../config/config.json");
 
 // import { getTicker } from '../utility/fetch';
 
@@ -15,6 +19,11 @@ async function command(msg: Discord.Message, ticker: string, amount: any) {
 
     if (!ticker) {
         msg.reply('Must supply a ticker.');
+        return;
+    }
+    let content = JSON.parse(fs.readFileSync(config_file_path, 'utf8'));
+    if (content.freeze){
+        msg.reply("Adding/removing is not allowed right now");
         return;
     }
 
@@ -54,10 +63,16 @@ async function command(msg: Discord.Message, ticker: string, amount: any) {
         return
     }
 
-    // Setup coin add History if Non Existant
-    if (!data.addhistory[ticker]) {
+    try{
+        if (!data.addhistory[ticker]) {
+            data.addhistory[ticker] = [];
+        }
+    }catch{
+        data.addhistory = {};
         data.addhistory[ticker] = [];
     }
+    // Setup coin add History if Non Existant
+    
 
     data.portfolio[ticker] = amount;
     data.addhistory[ticker].push({amount: amount, price:current_price, value:current_value})

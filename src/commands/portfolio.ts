@@ -116,7 +116,7 @@ async function portfolioHandler(data: IPortfolio): Promise<Array<string>> {
         portfolioTable.addRow(
                 ticker.toUpperCase(),
                 `$${parseFloat(buyCoin.toFixed(2)).toLocaleString()}` ,
-                `$${parseFloat(Amount.toFixed(2)).toLocaleString()}` ,
+                `${parseFloat(Amount.toFixed(2)).toLocaleString()}` ,
                 `$${parseFloat(buyValue.toFixed(2)).toLocaleString()}` ,
                 `$${parseFloat(currentValue.toFixed(2)).toLocaleString()}` ,
                 `$${parseFloat(tChange.toFixed(2)).toLocaleString()}` ,

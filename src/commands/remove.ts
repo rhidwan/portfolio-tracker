@@ -3,6 +3,10 @@ import { registerCommand } from '../service/commands';
 import { COLLECTIONS } from '../enums/collections';
 import { IPortfolio } from '../interfaces/IPortfolio';
 import { getDatabase } from '../utility/database';
+var path = require('path');
+const fs = require('fs');
+
+var config_file_path = path.resolve(__dirname, "../config/config.json");
 
 registerCommand({
     name: 'remove',
@@ -17,7 +21,11 @@ async function command(msg: Discord.Message, ticker: string) {
         msg.reply('Must supply a ticker.');
         return;
     }
-
+    let content = JSON.parse(fs.readFileSync(config_file_path, 'utf8'));
+    if (content.freeze){
+        msg.reply("Adding/removing is not allowed right now");
+        return;
+    }
     ticker = ticker.toLowerCase();
     // amount = parseFloat(amount);
 

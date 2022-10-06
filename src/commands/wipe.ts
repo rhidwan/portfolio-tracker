@@ -19,9 +19,9 @@ async function command(msg: Discord.Message) {
     await db.updatePartialData(data._id, { history: data.history, portfolio: data.portfolio }, COLLECTIONS.CRYPTO);
 
     if (!data.privacy) {
-        msg.reply('Wiped. https://giphy.com/gifs/yV5xcSTmtVPBS');
+        msg.reply('Portfolio Wiped');
     } else {
-        msg.author.send('Wiped. https://giphy.com/gifs/yV5xcSTmtVPBS');
+        msg.author.send('Portfolio Wiped');
     }
 
     try{

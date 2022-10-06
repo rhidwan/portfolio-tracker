@@ -7,7 +7,7 @@ const commands: Array<ICommand> = [
     {
         name: 'help',
         command: help,
-        description: '- Stop it. Get some help.',
+        description: 'Display Available Commands',
     },
 ];
 
@@ -34,12 +34,11 @@ export async function propogateCommands(cwd: string) {
 }
 
 function help(msg: Discord.Message): void {
-    let data = 'Here are some commands... \r\n ```';
+    let data = '```';
 
-    commands.forEach((cmd) => {
-        data += `!${cmd.name} - ${cmd.description} \r\n`;
-    });
+    data += "!help - Display available commands\n!add - Add coin to portfolio. !add <ticker> <amount>\n!portfolio - Display your portfolio\n!remove - Remove a token from your portfolio. !remove <ticker>\n!price <ticker> - Display current price of coin.\n!wipe - Delete your portfolio"
 
+    
     data += '\r\n```';
     msg.reply(data);
 }
