@@ -36,7 +36,7 @@ export async function propogateCommands(cwd: string) {
 function help(msg: Discord.Message): void {
     let data = '```';
 
-    data += "!help - Display available commands\n!add - Add coin to portfolio. !add <ticker> <amount>\n!portfolio - Display your portfolio\n!remove - Remove a token from your portfolio. !remove <ticker>\n!price <ticker> - Display current price of coin.\n!wipe - Delete your portfolio"
+    data += "!help - Display available commands\n!add - Add token to portfolio. !add <ticker> <qty of tokens>\n!portfolio - Display your portfolio\n!remove - Remove a token from your portfolio. !remove <ticker>\n!price  - Display current price of token. !price <ticker>\n!wipe - Delete your portfolio"
 
     
     data += '\r\n```';

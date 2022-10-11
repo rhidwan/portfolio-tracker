@@ -5,7 +5,7 @@ import {IPortfolio} from '../interfaces/IPortfolio';
 import {getDatabase} from '../utility/database';
 import {periodicPortfolio} from '../commands/portfolio';
 
-const TimeBetweenUpdates = 6000 * 10; // 1 Minute
+const TimeBetweenUpdates = 6000 * 10 * 2; // 1 Minute
 let cachedMembers: Array<Discord.User> = [];
 let nextUpdate: number;
 
